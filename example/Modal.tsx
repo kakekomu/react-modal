@@ -2,10 +2,11 @@ import * as React from "react"
 
 interface Props {
   message: string
+  timer: number
   onClose: () => void
 }
 
-const Modal: React.FunctionComponent<Props> = ({ message, onClose }) => (
+const Modal: React.FunctionComponent<Props> = ({ message, timer, onClose }) => (
   <div
     style={{
       position: "fixed",
@@ -18,6 +19,7 @@ const Modal: React.FunctionComponent<Props> = ({ message, onClose }) => (
   >
     <h1>This is a Modal</h1>
     <p>{message}</p>
+    <p>This is a timer, with passed props: {timer} sec</p>
     <button onClick={onClose}>Close</button>
   </div>
 )

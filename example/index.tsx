@@ -7,6 +7,19 @@ const App = () => {
   const [activeModal, modalHandlers] = useModal({
     myModal: Modal,
   })
+
+  const [timer, setTimer] = React.useState(0)
+
+  setTimeout(() => setTimer(timer + 1), 1000)
+
+  React.useEffect(() => {
+    modalHandlers.passProps("myModal", {
+      message: "This custom message is passed as a prop.",
+      timer,
+      onClose: modalHandlers.closeModal,
+    })
+  }, [timer])
+
   return (
     <div>
       {activeModal}
@@ -17,6 +30,7 @@ const App = () => {
         onClick={() =>
           modalHandlers.toggleModal("myModal", {
             message: "This custom message is passed as a prop.",
+            timer,
             onClose: modalHandlers.closeModal,
           })
         }
@@ -28,12 +42,14 @@ const App = () => {
         onClick={() =>
           modalHandlers.openModal("myModal", {
             message: "The message can be different.",
+            timer,
             onClose: modalHandlers.closeModal,
           })
         }
       >
         Open Modal
       </button>
+      <p>Timer: {timer} sec</p>
     </div>
   )
 }
