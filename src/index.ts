@@ -8,40 +8,50 @@ import {
 
 export type Modals = { [K in string]: FunctionComponent<any> }
 
-export interface ModalHandlers<T extends Modals, K extends keyof T> {
-  toggleModal: (name: K, props: ComponentProps<T[K]>) => void
-  openModal: (modalName: K, props: ComponentProps<T[K]>) => void
-  passProps: (name: K, props: ComponentProps<T[K]>) => void
+export interface ModalHandlers<T extends Modals> {
+  toggleModal: <K extends keyof T>(name: K, props: ComponentProps<T[K]>) => void
+  openModal: <K extends keyof T>(
+    modalName: K,
+    props: ComponentProps<T[K]>
+  ) => void
+  passProps: <K extends keyof T>(name: K, props: ComponentProps<T[K]>) => void
   closeModal: () => void
 }
+
+// This is a strange hack to allow passing a ModalHandlers with multiple modals to
+// functions, with only the needed modals declared
+type Identity<T> = {
+  [P in keyof T]: T[P]
+}
+export type PartialModalHandlers<T extends Modals> = Identity<ModalHandlers<T>>
 
 interface ModalState<T extends Modals> {
   name?: keyof T
   component: ReactNode
 }
 
-type Action<T extends Modals, K extends keyof T> =
-  | OpenModalAction<T, K>
-  | PassPropsAction<T, K>
-  | ToggleModalAction<T, K>
+type Action<T extends Modals> =
+  | OpenModalAction<T>
+  | PassPropsAction<T>
+  | ToggleModalAction<T>
   | CloseModal
 
-interface OpenModalAction<T extends Modals, K extends keyof T> {
+interface OpenModalAction<T extends Modals> {
   type: "openModal"
-  name: K
-  props: ComponentProps<T[K]>
+  name: keyof T
+  props: ComponentProps<T[keyof T]>
 }
 
-interface PassPropsAction<T extends Modals, K extends keyof T> {
+interface PassPropsAction<T extends Modals> {
   type: "passProps"
-  name: K
-  props: ComponentProps<T[K]>
+  name: keyof T
+  props: ComponentProps<T[keyof T]>
 }
 
-interface ToggleModalAction<T extends Modals, K extends keyof T> {
+interface ToggleModalAction<T extends Modals> {
   type: "toggleModal"
-  name: K
-  props: ComponentProps<T[K]>
+  name: keyof T
+  props: ComponentProps<T[keyof T]>
 }
 
 interface CloseModal {
@@ -50,16 +60,13 @@ interface CloseModal {
 
 export const useModal = <T extends Modals>(
   modals: T
-): [ReactNode, ModalHandlers<T, keyof T>] => {
+): [ReactNode, ModalHandlers<T>] => {
   const init: ModalState<T> = {
     name: undefined,
     component: undefined,
   }
 
-  const reducer = (
-    state: ModalState<T>,
-    action: Action<T, keyof T>
-  ): ModalState<T> => {
+  const reducer = (state: ModalState<T>, action: Action<T>): ModalState<T> => {
     switch (action.type) {
       case "openModal": {
         return {
