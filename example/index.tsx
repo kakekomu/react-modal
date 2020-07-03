@@ -1,11 +1,14 @@
 import * as ReactDOM from "react-dom"
 import * as React from "react"
-import Modal from "./Modal"
+import TimerModal from "./TimerModal"
+import SimpleModal from "./SimpleModal"
 import { useModal } from "../"
 
 const App = () => {
+  // Creating an object of all the possible modals. We can handle them later with the object keys.
   const [activeModal, modalHandlers] = useModal({
-    myModal: Modal,
+    simpleModal: SimpleModal,
+    timerModal: TimerModal,
   })
 
   const [timer, setTimer] = React.useState(0)
@@ -13,7 +16,8 @@ const App = () => {
   setTimeout(() => setTimer(timer + 1), 1000)
 
   React.useEffect(() => {
-    modalHandlers.passProps("myModal", {
+    // Passing a prop to an open modal. Has no effect on closed modals.
+    modalHandlers.passProps("timerModal", {
       message: "This custom message is passed as a prop.",
       timer,
       onClose: modalHandlers.closeModal,
@@ -28,27 +32,38 @@ const App = () => {
 
       <button
         onClick={() =>
-          modalHandlers.toggleModal("myModal", {
-            message: "This custom message is passed as a prop.",
-            timer,
+          // Open the SimpleModal and pass props to it. Props are type checked.
+          modalHandlers.openModal("simpleModal", {
             onClose: modalHandlers.closeModal,
           })
         }
       >
-        Toggle Modal
+        Open SimpleModal
       </button>
 
       <button
         onClick={() =>
-          modalHandlers.openModal("myModal", {
-            message: "The message can be different.",
+          // Open the TimerModal and pass props to it. Props are type checked.
+          modalHandlers.openModal("timerModal", {
+            message: "Default message",
             timer,
             onClose: modalHandlers.closeModal,
           })
         }
       >
-        Open Modal
+        Open TimerModal
       </button>
+
+      <button
+        onClick={() =>
+          modalHandlers.toggleModal("simpleModal", {
+            onClose: modalHandlers.closeModal,
+          })
+        }
+      >
+        Toggle SimpleModal
+      </button>
+
       <p>Timer: {timer} sec</p>
     </div>
   )
