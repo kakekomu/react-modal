@@ -6,10 +6,16 @@ import { useModal } from "../"
 
 const App = () => {
   // Creating an object of all the possible modals. We can handle them later with the object keys.
-  const [activeModal, modalHandlers] = useModal({
-    simpleModal: SimpleModal,
-    timerModal: TimerModal,
-  })
+  const [activeModal, modalHandlers] = useModal(
+    {
+      simpleModal: SimpleModal,
+      timerModal: TimerModal,
+    },
+    (modalHandlers) => ({
+      name: "simpleModal",
+      props: { onClose: modalHandlers.closeModal },
+    })
+  )
 
   const [timer, setTimer] = React.useState(0)
 

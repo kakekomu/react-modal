@@ -58,14 +58,18 @@ interface CloseModal {
   type: "closeModal"
 }
 
-export const useModal = <T extends Modals>(
-  modals: T
-): [ReactNode, ModalHandlers<T>] => {
-  const init: ModalState<T> = {
-    name: undefined,
-    component: undefined,
+export const useModal = <
+  T extends Modals,
+  K extends keyof T | undefined = undefined
+>(
+  modals: T,
+  init?: (
+    modalHandlers: ModalHandlers<T>
+  ) => {
+    name: K extends keyof T ? K : never
+    props: ComponentProps<T[K extends keyof T ? K : never]>
   }
-
+): [ReactNode, ModalHandlers<T>] => {
   const reducer = (state: ModalState<T>, action: Action<T>): ModalState<T> => {
     switch (action.type) {
       case "openModal": {
@@ -98,8 +102,6 @@ export const useModal = <T extends Modals>(
     }
   }
 
-  const [modalState, dispatch] = useReducer(reducer, init)
-
   const openModal = <K extends keyof T>(name: K, props: ComponentProps<T[K]>) =>
     dispatch({ type: "openModal", name, props })
 
@@ -119,6 +121,22 @@ export const useModal = <T extends Modals>(
     closeModal,
     toggleModal,
   }
+
+  const initialState = ((): ModalState<T> => {
+    if (init) {
+      const { name, props } = init(modalHandlers)
+      return {
+        name,
+        component: createElement(modals[name], props),
+      }
+    } else {
+      return {
+        name: undefined,
+        component: undefined,
+      }
+    }
+  })()
+  const [modalState, dispatch] = useReducer(reducer, initialState)
 
   return [modalState.component, modalHandlers]
 }
