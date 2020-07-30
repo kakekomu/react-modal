@@ -17,7 +17,7 @@ const Modal: React.FunctionComponent<Props> = ({ message, timer, onClose }) => (
       height: "200px",
     }}
   >
-    <h1>This is a Modal</h1>
+    <h1>This is a Modal with a Timer</h1>
     <p>{message}</p>
     <p>This is a timer, with passed props: {timer} sec</p>
     <button onClick={onClose}>Close</button>

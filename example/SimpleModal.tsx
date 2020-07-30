@@ -15,7 +15,7 @@ const Modal: React.FunctionComponent<Props> = ({ onClose }) => (
       height: "200px",
     }}
   >
-    <h1>This is a different Modal</h1>
+    <h1>This is a Simple Modal</h1>
     <button onClick={onClose}>Close</button>
   </div>
 )
